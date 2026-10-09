@@ -17,7 +17,9 @@ Drill progress and the guide passcode are saved only in the viewer's own browser
 | Public site (GitHub Pages) | `worker/`, a Cloudflare Worker (`pinnacle-roleplay`, Apogee account) that calls the Claude API with Brian's key | Brian's Anthropic API account |
 | Claude Artifact | The artifact's built-in Claude access (`sample` capability) | Each viewer's own Claude plan |
 
-The Worker accepts only requests from the Pages origin with the right guide passcode, and stops at 400 requests a day overall and 120 per IP (soft caps in KV). It uses `claude-opus-5-5` (low effort for prospect turns, medium for feedback) with server-side refusal fallback on. Change `MODEL` in `worker/wrangler.jsonc` to `claude-haiku-5-5` for faster, cheaper turns.
+The Worker accepts only requests from the Pages origin with the right guide passcode, and stops at 200 replies a day overall and 60 per IP (soft caps in KV). It uses `claude-haiku-5-5` (low effort for prospect turns, medium for feedback), about a third of a cent per role-play. `MODEL` in `worker/wrangler.jsonc` switches it.
+
+The hard ceiling is the Anthropic side: the API key lives in its own workspace (`objection-lab`) with a monthly spend limit, so the bill cannot pass that number whatever happens to the passcode.
 
 The role-play rules live in one place, `src/roleplay-prompt.js`. The Worker imports it and `build.py` inlines it into the page.
 

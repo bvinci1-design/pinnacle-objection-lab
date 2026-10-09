@@ -87,22 +87,22 @@ export default {
 
     const ending = turns[turns.length - 1].content === "END";
     const system = buildRoleplayRules({ persona: body.persona, objection: body.objection, rounds: body.rounds, context: body.context });
-    const messages: Anthropic.Beta.BetaMessageParam[] = [{ role: "user", content: ROLEPLAY_KICKOFF }, ...turns];
+    const messages: Anthropic.MessageParam[] = [{ role: "user", content: ROLEPLAY_KICKOFF }, ...turns];
 
     const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
     try {
-      const response = await client.beta.messages.create({
-        model: env.MODEL || "claude-opus-5-5",
+      // Haiku 5.5: fast enough for spoken back-and-forth and a fraction of a cent per role-play.
+      // Low effort for the prospect's short lines, medium for the end-of-call feedback.
+      const response = await client.messages.create({
+        model: env.MODEL || "claude-haiku-5-5",
         max_tokens: ending ? 4000 : 2000,
-        betas: ["server-side-fallback-2026-07-01"],
-        fallbacks: "default",
         output_config: { effort: ending ? "medium" : "low" },
         system,
         messages,
       });
       if (response.stop_reason === "refusal") return json({ error: "declined" }, 200, cors);
       const reply = response.content
-        .filter((b): b is Anthropic.Beta.BetaTextBlock => b.type === "text")
+        .filter((b): b is Anthropic.TextBlock => b.type === "text")
         .map((b) => b.text)
         .join("")
         .trim();
