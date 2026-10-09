@@ -162,6 +162,7 @@ input[type="password"]{width:100%;background:var(--surface);border:1px solid var
 .compose textarea{min-height:90px}
 .voice-opts{display:flex;gap:18px;flex-wrap:wrap}
 .compose .progress{align-self:center}
+select.mini{width:auto;padding:4px 8px;font-size:13px}
 label.inline{text-transform:none;letter-spacing:0;font-weight:500;color:var(--ink);display:flex;gap:6px;align-items:center;font-size:13px;margin:0}
 #rpMic[aria-pressed="true"]{background:var(--red);color:var(--on-red);border-color:var(--red)}
 .manual summary{cursor:pointer;font-weight:600;font-size:14px}
@@ -297,7 +298,8 @@ footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--line);font-si
             <span class="progress" id="rpCount"></span>
           </div>
           <div class="voice-opts">
-            <label class="inline" id="rpAutoRow" hidden><input type="checkbox" id="rpAutoSend" checked> Send when I stop talking</label>
+            <label class="inline" id="rpAutoRow" hidden>Send after a pause of
+              <select id="rpPause" class="mini"><option value="2000">2 seconds</option><option value="3000" selected>3 seconds</option><option value="5000">5 seconds</option><option value="0">Off (I'll press Send)</option></select></label>
             <label class="inline" id="rpSpeakRow" hidden><input type="checkbox" id="rpSpeak"> Read the prospect's replies aloud</label>
           </div>
         </div>
@@ -1058,30 +1060,64 @@ $("rpSend").addEventListener("click", function(){ rpSend($("rpInput").value, fal
 $("rpInput").addEventListener("keydown", function(ev){ if (ev.key === "Enter" && (ev.metaKey || ev.ctrlKey)) { ev.preventDefault(); rpSend($("rpInput").value, false); } });
 $("rpEnd").addEventListener("click", function(){ rpSend("END", true); });
 
-/* Voice input (public site only; artifacts can't use the microphone) */
+/* Voice input (public site only; artifacts can't use the microphone).
+   Listens continuously and sends only after the chosen stretch of silence, so
+   natural pauses mid-thought don't cut the reply off. */
 var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-function rpStopListening(){ if (rp.rec && rp.listening) try { rp.rec.stop(); } catch(e) {} }
+var PAUSE_KEY = "pinnacle-objection-lab-pause";
+try { var savedPause = localStorage.getItem(PAUSE_KEY); if (savedPause !== null && $("rpPause").querySelector('option[value="' + savedPause + '"]')) $("rpPause").value = savedPause; } catch(e) {}
+$("rpPause").addEventListener("change", function(){ try { localStorage.setItem(PAUSE_KEY, $("rpPause").value); } catch(e) {} });
+
+function rpMicUi(on){
+  $("rpMic").setAttribute("aria-pressed", on ? "true" : "false");
+  $("rpMic").textContent = on ? "Stop" : "Speak";
+}
+function rpStopListening(send){
+  rp.wantListen = false; rp.sendOnEnd = !!send;
+  clearTimeout(rp.silence);
+  if (rp.rec && rp.listening) try { rp.rec.stop(); } catch(e) {}
+}
+function rpArmSilence(){
+  clearTimeout(rp.silence);
+  var ms = parseInt($("rpPause").value, 10);
+  if (ms > 0) rp.silence = setTimeout(function(){ rpStopListening(true); }, ms);
+}
+function rpStartSession(){
+  var rec = new SR(); rp.rec = rec;
+  rec.lang = "en-US"; rec.interimResults = true; rec.continuous = true;
+  var base = $("rpInput").value.trim();
+  rec.onresult = function(ev){
+    var text = "";
+    for (var i = 0; i < ev.results.length; i++) text += ev.results[i][0].transcript;
+    $("rpInput").value = (base ? base + " " : "") + text.trim();
+    rp.heard = true;
+    rpArmSilence();
+  };
+  rec.onerror = function(ev){
+    if (ev.error === "no-speech" || ev.error === "aborted") return;
+    rp.wantListen = false;
+    rpAlert(ev.error === "not-allowed" ? "Microphone access was blocked. Allow it in your browser to speak your replies." : "Didn't catch that. Try again or type your reply.");
+  };
+  rec.onend = function(){
+    // Browsers end a session on their own after a while; keep listening until the pause timer or Stop.
+    if (rp.wantListen) { try { rpStartSession(); return; } catch(e) {} }
+    rp.listening = false; clearTimeout(rp.silence); rpMicUi(false);
+    if ($("rpLiveStatus").textContent.indexOf("Listening") === 0) $("rpLiveStatus").textContent = "";
+    var auto = parseInt($("rpPause").value, 10) > 0;
+    if (rp.sendOnEnd && auto && rp.heard && $("rpInput").value.trim() && !rp.busy) rpSend($("rpInput").value, false);
+  };
+  rec.start();
+}
 $("rpMic").addEventListener("click", function(){
   if (!SR) return;
-  if (rp.listening) { rpStopListening(); return; }
-  var rec = new SR(); rp.rec = rec;
-  rec.lang = "en-US"; rec.interimResults = true; rec.continuous = false;
-  var base = $("rpInput").value.trim(), finalText = "";
-  rec.onresult = function(ev){
-    var interim = "";
-    for (var i = ev.resultIndex; i < ev.results.length; i++) {
-      if (ev.results[i].isFinal) finalText += ev.results[i][0].transcript; else interim += ev.results[i][0].transcript;
-    }
-    $("rpInput").value = (base ? base + " " : "") + (finalText + interim).trim();
-  };
-  rec.onerror = function(ev){ rpAlert(ev.error === "not-allowed" ? "Microphone access was blocked. Allow it in your browser to speak your replies." : "Didn't catch that. Try again or type your reply."); };
-  rec.onend = function(){
-    rp.listening = false; $("rpMic").setAttribute("aria-pressed", "false"); $("rpMic").textContent = "Speak";
-    if ($("rpAutoSend").checked && finalText.trim() && !rp.busy) rpSend($("rpInput").value, false);
-  };
+  if (rp.listening) { rpStopListening(true); return; }
   try { speechSynthesis.cancel(); } catch(e) {}
-  try { rec.start(); rp.listening = true; $("rpMic").setAttribute("aria-pressed", "true"); $("rpMic").textContent = "Stop"; rpAlert(""); $("rpLiveStatus").textContent = "Listening…"; }
-  catch(e) { rpAlert("Couldn't start the microphone."); }
+  rp.wantListen = true; rp.sendOnEnd = false; rp.heard = false;
+  try {
+    rpStartSession(); rp.listening = true; rpMicUi(true); rpAlert("");
+    var ms = parseInt($("rpPause").value, 10);
+    $("rpLiveStatus").textContent = ms > 0 ? "Listening… sends " + (ms / 1000) + " seconds after you stop talking." : "Listening… press Stop, then Send.";
+  } catch(e) { rp.wantListen = false; rpAlert("Couldn't start the microphone."); }
 });
 
 function rpDetect(){
