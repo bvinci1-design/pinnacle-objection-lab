@@ -94,6 +94,8 @@ button,select,textarea,input{font:inherit;color:inherit}
 .btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
 .btn:hover{filter:brightness(1.08)}
 .status{font-size:13px;color:var(--muted);min-height:1.4em}
+.status.alert{color:var(--miss);background:var(--warn-bg);border-left:3px solid var(--red);border-radius:6px;padding:10px 12px;font-size:14px;font-weight:600}
+.status.alert:empty{display:none}
 
 /* Lessons */
 .shape{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin-bottom:22px}
@@ -988,6 +990,7 @@ var RP_ERRORS = {
   sampling_disabled: "Claude isn't available for this account. Use the copy-prompt option below.",
   network: "Couldn't reach the role-play service. Check your connection and try again."
 };
+function rpAlert(msg){ var st = $("rpLiveStatus"); st.textContent = msg; st.classList.toggle("alert", !!msg); if (msg) try { st.scrollIntoView({ block: "nearest", behavior: "smooth" }); } catch(e) {} }
 function rpErrorText(code){ return RP_ERRORS[code] || "The prospect didn't answer. Try sending again."; }
 
 function rpMsg(kind, text){
@@ -1026,7 +1029,7 @@ function rpSpeak(text){
 }
 
 function rpTurn(waitingLabel){
-  rpSetBusy(true); $("rpLiveStatus").textContent = "";
+  rpSetBusy(true); rpAlert("");
   var bubble = rpMsg("prospect waiting", waitingLabel || "…");
   var txt = bubble.querySelector(".txt");
   return rpAsk(function(t){ bubble.classList.remove("waiting"); txt.textContent = t; })
@@ -1045,7 +1048,8 @@ function rpTurn(waitingLabel){
       return true;
     }, function(e){
       bubble.remove();
-      $("rpLiveStatus").textContent = rpErrorText(e.code);
+      rpAlert(rpErrorText(e.code));
+      if (e.code === "bad_passcode") { rpLock(false); $("rpPass").focus(); $("rpPass").select(); }
       if (e.code === "not_granted" || e.code === "sampling_disabled") { $("rpLive").hidden = true; $("rpNoLive").hidden = false; $("rpManual").open = true; }
       return false;
     })
@@ -1060,7 +1064,7 @@ function rpFinish(){
 $("rpStart").addEventListener("click", function(){
   if (rp.backend === "worker") {
     var pc = $("rpPass").value.trim();
-    if (!pc) { $("rpLiveStatus").textContent = "Enter the guide passcode first."; $("rpPass").focus(); return; }
+    if (!pc) { rpAlert("Enter the guide passcode first."); $("rpPass").focus(); return; }
     try { localStorage.setItem(PASS_KEY, pc); } catch(e) {}
   }
   rp.turns = []; rp.replies = 0; $("rpChat").replaceChildren();
@@ -1075,14 +1079,14 @@ $("rpReset").addEventListener("click", function(){
   try { speechSynthesis.cancel(); } catch(e) {}
   rpStopListening();
   rp.turns = []; rp.replies = 0; $("rpChat").replaceChildren(); $("rpCompose").hidden = true;
-  $("rpReset").hidden = true; $("rpStart").hidden = false; $("rpLiveStatus").textContent = ""; $("rpInput").value = "";
+  $("rpReset").hidden = true; $("rpStart").hidden = false; rpAlert(""); $("rpInput").value = "";
   rpLock(false);
 });
 
 function rpSend(text, isEnd){
   if (rp.busy) return;
   text = String(text || "").trim();
-  if (!text) { $("rpLiveStatus").textContent = "Write or say your reply first."; $("rpInput").focus(); return; }
+  if (!text) { rpAlert("Write or say your reply first."); $("rpInput").focus(); return; }
   rpStopListening();
   try { speechSynthesis.cancel(); } catch(e) {}
   var shown = isEnd ? rpMsg("note", "You ended the call. Getting feedback…") : rpMsg("you", text);
@@ -1112,14 +1116,14 @@ $("rpMic").addEventListener("click", function(){
     }
     $("rpInput").value = (base ? base + " " : "") + (finalText + interim).trim();
   };
-  rec.onerror = function(ev){ $("rpLiveStatus").textContent = ev.error === "not-allowed" ? "Microphone access was blocked. Allow it in your browser to speak your replies." : "Didn't catch that. Try again or type your reply."; };
+  rec.onerror = function(ev){ rpAlert(ev.error === "not-allowed" ? "Microphone access was blocked. Allow it in your browser to speak your replies." : "Didn't catch that. Try again or type your reply."); };
   rec.onend = function(){
     rp.listening = false; $("rpMic").setAttribute("aria-pressed", "false"); $("rpMic").textContent = "Speak";
     if ($("rpAutoSend").checked && finalText.trim() && !rp.busy) rpSend($("rpInput").value, false);
   };
   try { speechSynthesis.cancel(); } catch(e) {}
-  try { rec.start(); rp.listening = true; $("rpMic").setAttribute("aria-pressed", "true"); $("rpMic").textContent = "Stop"; $("rpLiveStatus").textContent = "Listening…"; }
-  catch(e) { $("rpLiveStatus").textContent = "Couldn't start the microphone."; }
+  try { rec.start(); rp.listening = true; $("rpMic").setAttribute("aria-pressed", "true"); $("rpMic").textContent = "Stop"; rpAlert(""); $("rpLiveStatus").textContent = "Listening…"; }
+  catch(e) { rpAlert("Couldn't start the microphone."); }
 });
 
 function rpDetect(){
