@@ -13,6 +13,9 @@
     "DAILY_CAP": "200",
     "DAILY_CAP_PER_IP": "60"
   },
+  "d1_databases": [
+    { "binding": "FEEDBACK", "database_name": "objection-lab-feedback", "database_id": "102257fe-de2d-46e1-9e2f-91f716eb5f8c", "migrations_dir": "migrations" }
+  ],
   "kv_namespaces": [
     { "binding": "LIMITS", "id": "c5cb7186e5254ceba0763f9744e3f28a" }
   ]

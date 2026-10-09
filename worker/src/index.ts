@@ -1,6 +1,7 @@
-// Live role-play backend for the Pinnacle Objection Lab (GitHub Pages build).
-// Holds the Anthropic API key so the public page never sees it. Guarded by a
-// shared guide passcode, an origin allowlist, and daily caps kept in KV.
+// Backend for the Pinnacle Objection Lab (GitHub Pages build).
+// /roleplay: live role-play. Holds the Anthropic API key so the public page never sees it.
+// /feedback: stores guide feedback in D1 for triage (tools/feedback.py).
+// Both are guarded by a shared guide passcode, an origin allowlist, and daily caps kept in KV.
 import Anthropic from "@anthropic-ai/sdk";
 import { buildRoleplayRules, ROLEPLAY_KICKOFF } from "../../src/roleplay-prompt.js";
 
@@ -8,6 +9,7 @@ interface Env {
   ANTHROPIC_API_KEY: string;
   GUIDE_PASSCODE: string;
   LIMITS: KVNamespace;
+  FEEDBACK: D1Database;
   ALLOWED_ORIGINS: string;
   MODEL: string;
   DAILY_CAP: string;
@@ -40,10 +42,9 @@ function safeEqual(a: string, b: string): boolean {
 }
 
 // Soft daily caps. KV is eventually consistent, so these can overshoot slightly under bursts.
-async function overCap(env: Env, ip: string): Promise<boolean> {
+async function overCap(env: Env, ip: string, scope = "", caps = [parseInt(env.DAILY_CAP, 10) || 400, parseInt(env.DAILY_CAP_PER_IP, 10) || 120]): Promise<boolean> {
   const day = new Date().toISOString().slice(0, 10);
-  const keys = [`all:${day}`, `ip:${ip}:${day}`];
-  const caps = [parseInt(env.DAILY_CAP, 10) || 400, parseInt(env.DAILY_CAP_PER_IP, 10) || 120];
+  const keys = [`${scope}all:${day}`, `${scope}ip:${ip}:${day}`];
   const counts = await Promise.all(keys.map(async (k) => parseInt((await env.LIMITS.get(k)) || "0", 10)));
   if (counts[0] >= caps[0] || counts[1] >= caps[1]) return true;
   await Promise.all(keys.map((k, i) => env.LIMITS.put(k, String(counts[i] + 1), { expirationTtl: 60 * 60 * 48 })));
@@ -66,13 +67,48 @@ function cleanTurns(raw: unknown): Turn[] | null {
   return turns;
 }
 
+const FEEDBACK_KINDS = new Set(["card", "roleplay", "general"]);
+
+function str(v: unknown, max: number): string | null {
+  if (typeof v !== "string") return null;
+  const t = v.trim().slice(0, max);
+  return t || null;
+}
+function rating(v: unknown): number | null {
+  const n = Number(v);
+  return Number.isInteger(n) && n >= 1 && n <= 5 ? n : null;
+}
+
+async function saveFeedback(body: any, env: Env, cors: Record<string, string>): Promise<Response> {
+  if (!FEEDBACK_KINDS.has(body.kind)) return json({ error: "bad_request" }, 400, cors);
+  const row = {
+    kind: body.kind as string,
+    target: str(body.target, 200),
+    helpful: body.helpful === true ? 1 : body.helpful === false ? 0 : null,
+    rating_realism: rating(body.rating_realism),
+    rating_feedback: rating(body.rating_feedback),
+    name: str(body.name, 80),
+    message: str(body.message, 2000),
+    transcript: body.kind === "roleplay" ? str(body.transcript, 20000) : null,
+    page_version: str(body.page_version, 40),
+  };
+  if (row.helpful === null && row.rating_realism === null && row.rating_feedback === null && !row.message) {
+    return json({ error: "empty_feedback" }, 400, cors);
+  }
+  await env.FEEDBACK.prepare(
+    "INSERT INTO feedback (kind, target, helpful, rating_realism, rating_feedback, name, message, transcript, page_version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+  ).bind(row.kind, row.target, row.helpful, row.rating_realism, row.rating_feedback, row.name, row.message, row.transcript, row.page_version).run();
+  console.log(JSON.stringify({ kind: "feedback_saved", type: row.kind, has_message: !!row.message, has_transcript: !!row.transcript }));
+  return json({ ok: true }, 200, cors);
+}
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const cors = corsHeaders(request.headers.get("Origin"), env);
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: cors });
     const url = new URL(request.url);
     if (url.pathname === "/health") return json({ ok: true }, 200, cors);
-    if (url.pathname !== "/roleplay" || request.method !== "POST") return json({ error: "not_found" }, 404, cors);
+    if ((url.pathname !== "/roleplay" && url.pathname !== "/feedback") || request.method !== "POST") return json({ error: "not_found" }, 404, cors);
     if (!cors["Access-Control-Allow-Origin"]) return json({ error: "origin_not_allowed" }, 403, cors);
 
     let body: any;
@@ -82,10 +118,15 @@ export default {
     if (typeof body.passcode !== "string" || !safeEqual(body.passcode.trim(), env.GUIDE_PASSCODE.trim())) {
       return json({ error: "bad_passcode" }, 401, cors);
     }
+    const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+
+    if (url.pathname === "/feedback") {
+      if (await overCap(env, ip, "fb:", [500, 60])) return json({ error: "daily_limit" }, 429, cors);
+      return saveFeedback(body, env, cors);
+    }
+
     const turns = cleanTurns(body.turns);
     if (!turns) return json({ error: "bad_request" }, 400, cors);
-
-    const ip = request.headers.get("CF-Connecting-IP") || "unknown";
     if (await overCap(env, ip)) return json({ error: "daily_limit" }, 429, cors);
 
     const ending = turns.length > 0 && turns[turns.length - 1].content === "END";

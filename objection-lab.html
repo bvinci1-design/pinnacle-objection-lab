@@ -118,6 +118,26 @@ button,select,textarea,input{font:inherit;color:inherit}
 .deeper li::before{content:"\21B3";position:absolute;left:0;color:var(--red-text)}
 .deeper-label{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--muted);margin-top:10px}
 
+/* Feedback */
+header{position:relative}
+.fb-open{position:absolute;top:0;right:0;padding:8px 12px;font-size:13px}
+@media (max-width:640px){.fb-open{position:static;margin-top:12px}}
+.fb-dialog{border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink);padding:22px 24px;width:min(560px,calc(100vw - 32px))}
+.fb-dialog::backdrop{background:rgba(20,20,22,.45)}
+.fb-dialog h2{font-size:26px}
+input[type="text"]{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:11px 12px}
+.card-fb{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+.card-fb .btn{padding:6px 12px;font-size:13px}
+.card-fb-note{display:flex;flex-direction:column;gap:8px;width:100%}
+.card-fb-note textarea{min-height:70px}
+.rate{background:var(--chip);border-radius:var(--radius);padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+.rate h3{font-size:20px}
+.rate-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.rate-q{font-size:14px}
+.seg{display:flex;gap:4px}
+.seg button{width:36px;height:36px;border-radius:8px;border:1px solid var(--line);background:var(--surface);font-weight:700;cursor:pointer;color:var(--ink)}
+.seg button[aria-checked="true"]{background:var(--ink);color:var(--ground);border-color:var(--ink)}
+
 /* Translator */
 .tscroll{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}
 table{border-collapse:collapse;width:100%;min-width:640px}
@@ -181,6 +201,7 @@ footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--line);font-si
         <p>For Certified Pinnacle Business Guides · Objection practice</p>
       </div>
     </div>
+    <button class="btn ghost fb-open" id="fbOpen" type="button" hidden>Send feedback</button>
     <p class="intro">Owners raise the same handful of concerns in almost every first conversation, from cost and timing to “we already run EOS®.” This is a practice space for those moments: what you'll hear, what it usually means, and a respectful path from the objection to a next step.</p>
   </header>
 
@@ -304,6 +325,14 @@ footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--line);font-si
           </div>
         </div>
         <p class="status" id="rpLiveStatus" role="status"></p>
+        <div id="rpRate" class="rate" hidden>
+          <h3>How did that feel?</h3>
+          <div class="rate-row"><span class="rate-q" id="rqReal">How realistic was the prospect?</span><div class="seg" role="radiogroup" aria-labelledby="rqReal" data-key="rating_realism"></div></div>
+          <div class="rate-row"><span class="rate-q" id="rqFb">How useful was the feedback?</span><div class="seg" role="radiogroup" aria-labelledby="rqFb" data-key="rating_feedback"></div></div>
+          <div><label for="rpRateMsg">Anything to improve? (optional)</label><textarea id="rpRateMsg" style="min-height:70px" placeholder="Too easy, too pushy, unrealistic line, unfair feedback…"></textarea></div>
+          <label class="inline"><input type="checkbox" id="rpRateTranscript"> Include this conversation so it can be used to improve the prospect</label>
+          <div class="actions" style="margin-top:0"><button class="btn red" id="rpRateSend" type="button">Send rating</button><span class="status" id="rpRateStatus" role="status"></span></div>
+        </div>
       </div>
 
       <details id="rpManual" class="manual">
@@ -318,6 +347,25 @@ footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--line);font-si
       <p class="note" style="margin-top:0">Your replies go to Claude to run the role-play. Leave client names and anything confidential out.</p>
     </div>
   </section>
+
+  <dialog id="fbDialog" class="fb-dialog" aria-labelledby="fbTitle">
+    <form id="fbForm" method="dialog" class="form" style="max-width:none">
+      <h2 id="fbTitle">Send feedback</h2>
+      <p class="note" style="margin:0" id="fbContext"></p>
+      <div><label for="fbType">What kind?</label>
+        <select id="fbType"><option value="bug">Something's broken or confusing</option><option value="idea">An idea or improvement</option><option value="missing">An objection that's missing</option><option value="other">Something else</option></select></div>
+      <div><label for="fbMessage">Your feedback</label><textarea id="fbMessage" placeholder="What happened, or what would make this better?"></textarea></div>
+      <div class="row">
+        <div><label for="fbName">Your name (optional)</label><input id="fbName" type="text" autocomplete="name"></div>
+        <div id="fbPassRow"><label for="fbPass">Guide passcode</label><input id="fbPass" type="password" autocomplete="off" spellcheck="false"></div>
+      </div>
+      <p class="status" id="fbStatus" role="status"></p>
+      <div class="actions" style="margin-top:0">
+        <button class="btn red" id="fbSend" type="button">Send</button>
+        <button class="btn ghost" id="fbCancel" type="button">Close</button>
+      </div>
+    </form>
+  </dialog>
 
   <footer>
     <span>Built by Brian Vinci, Certified Pinnacle Business Guide (Apogee Leadership). Pinnacle Business Guides™, The Pinnacle Approach™, 5 Pinnacle Principles™ and Pinnacle tool names belong to Pinnacle Business Guides and are used with permission.</span>
@@ -808,9 +856,99 @@ function renderCard(){
   var st = el("span", "status"); st.setAttribute("role", "status");
   cp.addEventListener("click", function(){ copyText(cardText(o), st, "Copied. Paste it into your notes."); });
   act.append(d, cp, st); card.append(act);
+  if (FB.enabled) card.append(cardFeedback(o));
 }
 function cardText(o){
   return "“" + o.line + "”\n\nACKNOWLEDGE: " + o.ack + "\nASK: " + o.ask + (o.probes ? "\nGO DEEPER: " + o.probes.join(" / ") : "") + "\nLAND ONE POINT: " + o.point + "\nSHOW IT: " + o.show + "\nLEAVE ROOM FOR NO: " + o.exit + "\nAVOID: " + o.avoid + "\n\nSource: " + o.source;
+}
+
+/* Feedback (public site only: it posts to the Worker, which the artifact can't reach) */
+var FB = { enabled: false, url: "", version: "2026-10-09T14:04Z" };
+var NAME_KEY = "pinnacle-objection-lab-name";
+function fbSavedPass(){ try { return localStorage.getItem("pinnacle-objection-lab-passcode") || ""; } catch(e) { return ""; } }
+function fbSavedName(){ try { return localStorage.getItem(NAME_KEY) || ""; } catch(e) { return ""; } }
+function fbPost(payload, passcode){
+  payload.passcode = passcode || fbSavedPass();
+  payload.page_version = FB.version;
+  if (!payload.name) payload.name = fbSavedName() || undefined;
+  return fetch(FB.url + "/feedback", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
+    .then(function(r){ return r.json().catch(function(){ return { error: "upstream" }; }).then(function(d){ if (!r.ok || d.error) throw { code: d.error || "upstream" }; return d; }); },
+          function(){ throw { code: "network" }; });
+}
+function fbErrorText(code){
+  return code === "bad_passcode" ? "That passcode didn't work. Ask Brian for the current guide passcode."
+    : code === "daily_limit" ? "Too much feedback from here today. Thank you! Try again tomorrow."
+    : code === "network" ? "Couldn't send. Check your connection and try again."
+    : "Couldn't send that. Try again in a moment.";
+}
+
+var fbCtx = null;
+function fbOpenDialog(ctx){
+  fbCtx = ctx || null;
+  $("fbContext").textContent = ctx && ctx.label ? "About: " + ctx.label : "";
+  $("fbType").value = ctx && ctx.type ? ctx.type : "bug";
+  $("fbMessage").value = ctx && ctx.message ? ctx.message : "";
+  $("fbName").value = fbSavedName();
+  $("fbPass").value = "";
+  $("fbPassRow").hidden = !!fbSavedPass();
+  $("fbStatus").textContent = ""; $("fbStatus").classList.remove("alert");
+  try { $("fbDialog").showModal(); } catch(e) { $("fbDialog").setAttribute("open", ""); }
+  $("fbMessage").focus();
+}
+function fbCloseDialog(){ try { $("fbDialog").close(); } catch(e) { $("fbDialog").removeAttribute("open"); } }
+$("fbOpen").addEventListener("click", function(){ fbOpenDialog(null); });
+$("fbCancel").addEventListener("click", fbCloseDialog);
+$("fbSend").addEventListener("click", function(){
+  var msg = $("fbMessage").value.trim(), st = $("fbStatus");
+  if (!msg) { st.textContent = "Write your feedback first."; st.classList.add("alert"); $("fbMessage").focus(); return; }
+  var pass = fbSavedPass() || $("fbPass").value.trim();
+  if (!pass) { st.textContent = "Enter the guide passcode."; st.classList.add("alert"); $("fbPass").focus(); return; }
+  var name = $("fbName").value.trim();
+  try { if (name) localStorage.setItem(NAME_KEY, name); } catch(e) {}
+  var payload = fbCtx && fbCtx.kind === "card"
+    ? { kind: "card", target: fbCtx.target, helpful: fbCtx.helpful === true, message: msg, name: name || undefined }
+    : { kind: "general", target: $("fbType").value, message: msg, name: name || undefined };
+  $("fbSend").disabled = true; st.classList.remove("alert"); st.textContent = "Sending…";
+  fbPost(payload, pass).then(function(){
+    try { localStorage.setItem("pinnacle-objection-lab-passcode", pass); } catch(e) {}
+    st.textContent = "Thanks. Brian will see this."; $("fbMessage").value = "";
+    if (fbCtx && fbCtx.onSent) fbCtx.onSent();
+    setTimeout(fbCloseDialog, 1200);
+  }, function(e){ st.textContent = fbErrorText(e.code); st.classList.add("alert"); })
+  .then(function(){ $("fbSend").disabled = false; });
+});
+
+function cardFeedback(o){
+  var row = el("div", "card-fb");
+  row.append(el("span", null, "Was this card useful?"));
+  var yes = el("button", "btn ghost", "Helpful"); yes.type = "button";
+  var no = el("button", "btn ghost", "Needs work"); no.type = "button";
+  var st = el("span", "status"); st.setAttribute("role", "status");
+  row.append(yes, no, st);
+  var done = function(msg){ yes.disabled = no.disabled = true; st.textContent = msg; };
+  yes.addEventListener("click", function(){
+    if (!fbSavedPass()) { fbOpenDialog({ kind: "card", target: o.id, label: "“" + o.line + "”", type: "idea", helpful: true, message: "This card was helpful.", onSent: function(){ done("Thanks."); } }); return; }
+    yes.disabled = no.disabled = true; st.textContent = "Sending…";
+    fbPost({ kind: "card", target: o.id, helpful: true }).then(function(){ done("Thanks."); }, function(e){ yes.disabled = no.disabled = false; st.textContent = fbErrorText(e.code); });
+  });
+  no.addEventListener("click", function(){
+    if (!fbSavedPass()) { fbOpenDialog({ kind: "card", target: o.id, label: "“" + o.line + "”", type: "idea", onSent: function(){ done("Thanks. Brian will see this."); } }); return; }
+    if (row.querySelector(".card-fb-note")) return;
+    var box = el("div", "card-fb-note");
+    var ta = el("textarea"); ta.placeholder = "What would make this card better? A line that doesn't sound right, a better question, a missing step…";
+    ta.setAttribute("aria-label", "What would make this card better?");
+    var send = el("button", "btn red", "Send"); send.type = "button";
+    send.addEventListener("click", function(){
+      var msg = ta.value.trim();
+      if (!msg) { st.textContent = "Add a note first."; ta.focus(); return; }
+      send.disabled = true; st.textContent = "Sending…";
+      fbPost({ kind: "card", target: o.id, helpful: false, message: msg }).then(function(){ box.remove(); done("Thanks. Brian will see this."); },
+        function(e){ send.disabled = false; st.textContent = fbErrorText(e.code); });
+    });
+    var acts = el("div", "actions"); acts.style.marginTop = "0"; acts.append(send);
+    box.append(ta, acts); row.append(box); ta.focus();
+  });
+  return row;
 }
 
 /* Lessons */
@@ -1060,6 +1198,7 @@ function rpTurn(waitingLabel){
 
 function rpFinish(){
   $("rpCompose").hidden = true; $("rpReset").hidden = false; $("rpStart").hidden = true;
+  if (FB.enabled) rpShowRating();
   rpStopListening();
 }
 
@@ -1080,7 +1219,7 @@ $("rpReset").addEventListener("click", function(){
   if (rp.ctl) try { rp.ctl.abort(); } catch(e) {}
   try { speechSynthesis.cancel(); } catch(e) {}
   rpStopListening();
-  rp.turns = []; rp.replies = 0; $("rpChat").replaceChildren(); $("rpCompose").hidden = true;
+  rp.turns = []; rp.replies = 0; $("rpChat").replaceChildren(); $("rpCompose").hidden = true; $("rpRate").hidden = true;
   $("rpReset").hidden = true; $("rpStart").hidden = false; rpAlert(""); $("rpInput").value = "";
   rpLock(false);
 });
@@ -1101,6 +1240,45 @@ function rpSend(text, isEnd){
 $("rpSend").addEventListener("click", function(){ rpSend($("rpInput").value, false); });
 $("rpInput").addEventListener("keydown", function(ev){ if (ev.key === "Enter" && (ev.metaKey || ev.ctrlKey)) { ev.preventDefault(); rpSend($("rpInput").value, false); } });
 $("rpEnd").addEventListener("click", function(){ rpSend("END", true); });
+
+/* Rating after a role-play */
+var rpRating = {};
+document.querySelectorAll("#rpRate .seg").forEach(function(seg){
+  for (var n = 1; n <= 5; n++) (function(n){
+    var b = el("button", null, String(n)); b.type = "button"; b.setAttribute("role", "radio"); b.setAttribute("aria-checked", "false");
+    b.setAttribute("aria-label", n + " out of 5");
+    b.addEventListener("click", function(){
+      rpRating[seg.dataset.key] = n;
+      seg.querySelectorAll("button").forEach(function(x){ x.setAttribute("aria-checked", String(x === b)); });
+    });
+    seg.append(b);
+  })(n);
+});
+function rpShowRating(){
+  rpRating = {};
+  document.querySelectorAll("#rpRate .seg button").forEach(function(x){ x.setAttribute("aria-checked", "false"); });
+  $("rpRateMsg").value = ""; $("rpRateTranscript").checked = false; $("rpRateStatus").textContent = ""; $("rpRateSend").disabled = false;
+  $("rpRate").hidden = false;
+}
+function rpTranscript(){
+  var lines = [];
+  $("rpChat").querySelectorAll(".msg").forEach(function(m){
+    var who = m.classList.contains("you") ? "Guide" : m.classList.contains("feedback") ? "Feedback" : m.classList.contains("note") ? "" : "Prospect";
+    var t = (m.querySelector(".txt") || m).textContent.trim();
+    if (t) lines.push(who ? who + ": " + t : "(" + t + ")");
+  });
+  return lines.join("\n\n");
+}
+$("rpRateSend").addEventListener("click", function(){
+  var msg = $("rpRateMsg").value.trim(), st = $("rpRateStatus");
+  if (!rpRating.rating_realism && !rpRating.rating_feedback && !msg) { st.textContent = "Pick a rating or add a note first."; return; }
+  var s = rpSettings();
+  var payload = { kind: "roleplay", target: $("rpPersona").value + "|" + $("rpObjection").value, rating_realism: rpRating.rating_realism, rating_feedback: rpRating.rating_feedback, message: msg || undefined };
+  if ($("rpRateTranscript").checked) payload.transcript = "Prospect: " + s.persona + "\nObjection: " + s.objection + "\n\n" + rpTranscript();
+  $("rpRateSend").disabled = true; st.textContent = "Sending…";
+  fbPost(payload, $("rpPass").value.trim()).then(function(){ st.textContent = "Thanks. That helps tune the prospect."; },
+    function(e){ $("rpRateSend").disabled = false; st.textContent = fbErrorText(e.code); });
+});
 
 /* Voice input (public site only; artifacts can't use the microphone).
    Listens continuously and sends only after the chosen stretch of silence, so
@@ -1175,7 +1353,10 @@ function rpDetect(){
   if (window.claude && typeof window.claude.use === "function") {
     Promise.resolve(window.claude.use("sample")).then(function(s){ if (s) { rp.backend = "claude"; rp.sample = s; } }, function(){}).then(done);
   } else {
-    if (ROLEPLAY_URL && ROLEPLAY_URL.indexOf("__") !== 0) rp.backend = "worker";
+    if (ROLEPLAY_URL && ROLEPLAY_URL.indexOf("__") !== 0) {
+      rp.backend = "worker";
+      FB.enabled = true; FB.url = ROLEPLAY_URL; $("fbOpen").hidden = false; renderCard();
+    }
     done();
   }
 }

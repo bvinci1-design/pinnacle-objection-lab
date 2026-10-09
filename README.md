@@ -51,6 +51,18 @@ Pinnacle marks are used with Pinnacle Business Guides' permission (confirmed by 
 
 To update both, run `python3 build.py`, commit and push for Pages, and republish `objection-lab.html` to the artifact.
 
+## Feedback loop
+
+Guides leave feedback without leaving the app: a Helpful / Needs work row on every card, a 1–5 rating after each role-play (prospect realism and feedback usefulness, with an opt-in transcript), and a **Send feedback** button for bugs, ideas and missing objections. The Worker's `/feedback` route stores it in the D1 database `objection-lab-feedback` (passcode-gated, 60 submissions per person per day).
+
+```
+python3 tools/feedback.py            # digest of new feedback
+python3 tools/feedback.py show 12    # one item with its transcript
+python3 tools/feedback.py resolve 12 done "what changed"
+```
+
+The full triage-fix-ship-close workflow, including what ships without Brian's sign-off, is in `.claude/skills/objection-lab-feedback/SKILL.md`. Tests: `sh tests/run.sh`.
+
 ## Editing content
 
 All content lives in arrays at the top of the script in `src/app.html`: `OBJ` (objections), `LESSONS`, `MAP` (the translator), and `PERSONAS` (role-play prospects). Keep the same rules when adding content:

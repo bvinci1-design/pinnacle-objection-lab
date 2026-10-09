@@ -5,7 +5,7 @@ objection-lab.html  the Claude Artifact page. Live role-play runs on the viewer'
 index.html          the standalone GitHub Pages site. Live role-play calls the
                     Cloudflare Worker in worker/ (passcode-gated).
 """
-import base64, pathlib, re
+import base64, datetime, pathlib, re
 
 ROLEPLAY_URL = "https://pinnacle-roleplay.pinnacle-roleplay.workers.dev"
 
@@ -14,7 +14,8 @@ src = (root / "src/app.html").read_text()
 prompt_js = re.sub(r"^export ", "", (root / "src/roleplay-prompt.js").read_text(), flags=re.M)
 logo = "data:image/png;base64," + base64.b64encode((root / "assets/pinnacle-logo.png").read_bytes()).decode()
 
-page = src.replace("__LOGO__", logo).replace("/*__ROLEPLAY_PROMPT__*/", prompt_js)
+build = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%MZ")  # tags feedback with the page version
+page = src.replace("__LOGO__", logo).replace("/*__ROLEPLAY_PROMPT__*/", prompt_js).replace("__BUILD__", build)
 
 (root / "objection-lab.html").write_text(page.replace("__ROLEPLAY_URL__", ""))
 (root / "index.html").write_text(
