@@ -23,7 +23,10 @@ Pinnacle marks are used with Pinnacle Business Guides' permission (confirmed by 
 
 ## Published
 
-Claude Artifact: https://claude.ai/artifact/EoK1QAF6oMHhQCHHKrhuHf (private until shared from the page's Share menu).
+- **For guides (no login):** https://bvinci1-design.github.io/pinnacle-objection-lab/ (GitHub Pages, serves `index.html` from `main`)
+- Claude Artifact: https://claude.ai/artifact/EoK1QAF6oMHhQCHHKrhuHf (private, Brian's working copy)
+
+To update both, run `python3 build.py`, commit and push for Pages, and republish `objection-lab.html` to the artifact.
 
 ## Editing content
 
