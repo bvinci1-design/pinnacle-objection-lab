@@ -94,6 +94,27 @@ button,select,textarea,input{font:inherit;color:inherit}
 .btn:hover{filter:brightness(1.08)}
 .status{font-size:13px;color:var(--muted);min-height:1.4em}
 
+/* Lessons */
+.shape{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin-bottom:22px}
+.shape h2{font-size:24px;margin-bottom:12px}
+.bar{display:flex;height:14px;border-radius:7px;overflow:hidden;gap:2px}
+.seg.s1,.sw.s1{background:var(--muted)} .seg.s2,.sw.s2{background:var(--red)} .seg.s3,.sw.s3{background:var(--wordmark)} .seg.s4,.sw.s4{background:var(--ink)} .seg.s5,.sw.s5{background:var(--muted)}
+.legend{list-style:none;margin:14px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px 18px}
+.legend li{font-size:13px;color:var(--muted);min-width:0}
+.legend b{display:block;font-family:var(--display);font-weight:400;font-size:18px;letter-spacing:.05em;color:var(--ink)}
+.sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:1px}
+.lessons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (max-width:760px){.lessons{grid-template-columns:minmax(0,1fr)}}
+.lesson{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.lesson h3{font-size:22px}
+.lesson p{margin:0}
+.lesson .try{border-left:3px solid var(--red);padding:2px 0 2px 12px;display:flex;flex-direction:column;gap:6px;font-size:14.5px}
+.lesson .watch{font-size:13px;color:var(--warn-ink);background:var(--warn-bg);border-radius:8px;padding:8px 12px}
+.deeper{margin:8px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px}
+.deeper li{font-size:14px;color:var(--muted);padding-left:16px;position:relative}
+.deeper li::before{content:"\21B3";position:absolute;left:0;color:var(--red-text)}
+.deeper-label{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--muted);margin-top:10px}
+
 /* Translator */
 .tscroll{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}
 table{border-collapse:collapse;width:100%;min-width:640px}
@@ -133,14 +154,14 @@ footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--line);font-si
       <div class="mark"><img src="__LOGO__" alt="Pinnacle Business Guides"></div>
       <div class="brand-text">
         <h1><span>Pinnacle</span> Objection Lab</h1>
-        <p>For Certified Pinnacle Business Guides · EOS® conversations</p>
+        <p>For Certified Pinnacle Business Guides · Objection practice</p>
       </div>
     </div>
-    <p class="intro">Most owners you meet have heard of EOS®, and plenty run it. This is a practice space for those conversations: what you'll hear, what it usually means, and a respectful path from the objection to a next step.</p>
+    <p class="intro">Owners raise the same handful of concerns in almost every first conversation, from cost and timing to “we already run EOS®.” This is a practice space for those moments: what you'll hear, what it usually means, and a respectful path from the objection to a next step.</p>
   </header>
 
   <section class="rules" aria-label="Rules of the road">
-    <div class="rule"><b>Never knock EOS®</b><span>Describe the difference. Let them name the flaws.</span></div>
+    <div class="rule"><b>Never knock the alternative</b><span>EOS®, their coach, or doing it themselves. Describe the difference and let them name the flaws.</span></div>
     <div class="rule"><b>Ask before you tell</b><span>One open question before any point you make.</span></div>
     <div class="rule"><b>Land one point</b><span>One clear difference beats five.</span></div>
     <div class="rule"><b>Respect a no</b><span>Leave every conversation with the door open.</span></div>
@@ -148,6 +169,7 @@ footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--line);font-si
 
   <nav class="tabs" role="tablist" aria-label="Sections">
     <button class="tab" role="tab" id="tab-objections" aria-controls="objections" aria-selected="true">Objections</button>
+    <button class="tab" role="tab" id="tab-lessons" aria-controls="lessons" aria-selected="false">Lessons</button>
     <button class="tab" role="tab" id="tab-translator" aria-controls="translator" aria-selected="false">EOS® to Pinnacle</button>
     <button class="tab" role="tab" id="tab-drill" aria-controls="drill" aria-selected="false">Drill</button>
     <button class="tab" role="tab" id="tab-roleplay" aria-controls="roleplay" aria-selected="false">Role-play with Claude</button>
@@ -159,6 +181,23 @@ footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--line);font-si
       <ul class="olist" id="olist" aria-label="Objections"></ul>
       <article class="card" id="ocard" aria-live="polite"></article>
     </div>
+  </section>
+
+  <section class="panel" id="lessons" role="tabpanel" aria-labelledby="tab-lessons" hidden>
+    <div class="shape" aria-label="Where the time goes in a first conversation">
+      <h2>Where the time goes</h2>
+      <div class="bar" aria-hidden="true">
+        <span style="flex:5" class="seg s1"></span><span style="flex:70" class="seg s2"></span><span style="flex:5" class="seg s3"></span><span style="flex:15" class="seg s4"></span><span style="flex:5" class="seg s5"></span>
+      </div>
+      <ol class="legend">
+        <li><i class="sw s1"></i><b>Connect</b> Why they're talking to you, and a frame for the conversation.</li>
+        <li><i class="sw s2"></i><b>Understand</b> Where they are, what it's costing them, what they've tried, and where they want to be. Most of the conversation.</li>
+        <li><i class="sw s3"></i><b>Bridge</b> Play back what they want, in their words, and ask permission to go on.</li>
+        <li><i class="sw s4"></i><b>Show</b> Only the parts of Pinnacle that close the gap they described.</li>
+        <li><i class="sw s5"></i><b>Agree</b> A next step they choose, with room to say no.</li>
+      </ol>
+    </div>
+    <div class="lessons" id="lessonGrid"></div>
   </section>
 
   <section class="panel" id="translator" role="tabpanel" aria-labelledby="tab-translator" hidden>
@@ -242,18 +281,184 @@ footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--line);font-si
 
 var CATS = [
   {id:"all", label:"All"},
-  {id:"eos", label:"Running EOS® today"},
-  {id:"outgrow", label:"Tried it or outgrowing it"},
-  {id:"same", label:"Isn't it the same?"},
+  {id:"money", label:"Money and value"},
+  {id:"time", label:"Time and timing"},
+  {id:"trust", label:"Trust and fit"},
   {id:"diy", label:"Doing it ourselves"},
-  {id:"process", label:"Process and people"}
+  {id:"process", label:"Process and people"},
+  {id:"eos", label:"EOS®: running it"},
+  {id:"outgrow", label:"EOS®: outgrowing it"},
+  {id:"same", label:"EOS®: same thing?"}
 ];
 
+var FIELD = "Guide field practice";
+
 var OBJ = [
+ {id:"cost", cat:"money", line:"It's more than we wanted to spend.",
+  means:["The value isn't clear to them yet.","Money really is tight right now.","They're weighing you against a cheaper option, like a book or doing it themselves."],
+  ack:"That's fair. It's a real investment, and it should earn its keep.",
+  ask:"When you say it's more than you wanted, is it the amount itself, or not being sure yet what you'd get for it?",
+  probes:["What is the current situation costing you now, in your time or in growth you're not getting?","What would need to happen in the first year for this to feel clearly worth it?"],
+  point:"Keep the conversation on their outcomes, not your fee. If the gap they described is worth closing, the question is whether this closes it.",
+  show:"Play back the two or three problems they named, and offer The Audition so they can judge the value on one real priority.",
+  exit:"If the numbers don't work right now, that's a legitimate answer. Better to say so than to stretch.",
+  avoid:"Discounting on the spot, quoting figures nobody asked for, or promising a return you can't back up.",
+  source:FIELD},
+ {id:"no-budget", cat:"money", line:"There's no budget for this right now.",
+  means:["Spending is set once a year and this wasn't in the plan.","Other spending is a higher priority.","A soft no."],
+  ack:"Understood. Most businesses plan their spending a year at a time.",
+  ask:"When something matters enough, how does it usually get funded in your business?",
+  probes:["If the funding were there, is this something you'd want to do?","When does planning for next year start?"],
+  point:"If it would matter once funded, the real questions are timing and priority, and you can plan around both.",
+  show:"Offer to help them make the case in their next planning cycle, built on the problems they named.",
+  exit:"If it isn't a priority even with the money in place, that's a clear answer, and I'd rather know.",
+  avoid:"Pushing them to find money they've told you they don't have.",
+  source:FIELD},
+ {id:"think", cat:"time", line:"I need to think about it.",
+  means:["A specific doubt they haven't said out loud.","They need to talk to someone first.","A polite no."],
+  ack:"Of course. It's a real decision, and you should feel sure about it.",
+  ask:"What part would you want to think through? Sometimes it helps to talk it out while we're both here.",
+  probes:["Is there anything I've said that didn't sit right with you?","What would you need to know to feel confident either way?"],
+  point:"There's usually one open question behind this. Find it and answer it, rather than agreeing to an open-ended wait.",
+  show:"Address the concern they name, then agree on a date to reconnect.",
+  exit:"Would it help to set a time next week, or would you rather reach out once you've decided either way?",
+  avoid:"Leaving with “I'll follow up” and no date. That usually means the conversation is over.",
+  source:FIELD},
+ {id:"busy", cat:"time", line:"We're too busy to take this on right now.",
+  means:["They're genuinely overloaded.","They don't yet see how this would reduce the load.","A brush-off."],
+  ack:"I hear you. A packed calendar is real.",
+  ask:"What's taking up most of your time right now?",
+  probes:["How much of that is work only you can do?","If nothing changes, what do the next six months look like?"],
+  point:"Being too busy is often the symptom this work fixes. Let them connect that themselves rather than telling them.",
+  show:"Win The Week or the Daily Stand-Up, as a small first step that frees time rather than taking it.",
+  exit:"If now really isn't workable, when would be? I'm glad to reconnect then.",
+  avoid:"Telling them they're too busy not to do this. Ask, and let them reach the conclusion.",
+  source:FIELD},
+ {id:"later", cat:"time", line:"Call me next quarter.",
+  means:["A real timing constraint.","It isn't a priority yet.","Easier than saying no."],
+  ack:"Happy to. Timing matters.",
+  ask:"What will be different next quarter that makes it a better time?",
+  probes:["What would need to happen between now and then?","Is there anything you'd want in place before the year closes?"],
+  point:"If there's a real reason to wait, respect it and pin down a time. If there isn't one, timing may not be the real issue.",
+  show:"Put a specific date on both calendars before the call ends.",
+  exit:"Shall we put a time on the calendar now, so neither of us has to chase the other?",
+  avoid:"Agreeing to “next quarter” with no date attached.",
+  source:FIELD},
+ {id:"consultants", cat:"trust", line:"We've worked with consultants before. Nothing really changed.",
+  means:["Burned by a report-and-leave engagement.","Skeptical of outside help in general.","Worried about spending the team's goodwill again."],
+  ack:"That's common, and it's a fair reason to be wary.",
+  ask:"What did they do, and where did it stop working?",
+  probes:["What would you need to see done differently this time?","What did the team say once they'd gone?"],
+  point:"A guide doesn't hand over a report and leave. The guide is in the room with the team, quarter after quarter, while the work gets done.",
+  show:"The Audition: let them see how a session actually runs before committing to anything.",
+  exit:"If that experience has put you off outside help for now, I understand.",
+  avoid:"Criticizing their previous consultant. Describe how you work instead.",
+  source:"Apogee insight: Consultant Fatigue Is Real"},
+ {id:"coach", cat:"trust", line:"We already have a coach (or a peer group, or an advisor).",
+  means:["They're happy with the support they have.","They're unsure how this is different.","They're worried about overlap."],
+  ack:"Good. It says you invest in getting better.",
+  ask:"What does that support help you with most?",
+  probes:["Is it focused on you, or on the whole leadership team?","Is there anything it doesn't cover that you wish it did?"],
+  point:"Coaching and peer groups usually develop the leader. A guide works with the whole leadership team on how the business runs. The two often sit side by side.",
+  show:"Ask what the team does between sessions, then show how F.A.S.T. Rocks turn good intentions into owned priorities.",
+  exit:"If what you have covers what you need, keep it. There's no reason to add something for its own sake.",
+  avoid:"Positioning yourself against their coach or peer group.",
+  source:"apogeeleadership.co EOS® alternative page (operating system vs. coaching)"},
+ {id:"small", cat:"trust", line:"We're too small for something like this.",
+  means:["They think operating systems are for big companies.","Worried about cost relative to their size.","They haven't felt the growing pains yet."],
+  ack:"Fair question. Plenty of owners assume this is for bigger companies.",
+  ask:"Where do you want the business to be in three years, and what would have to change to get there?",
+  probes:["How much of the business still runs through you?","What happens when you're away for a week?"],
+  point:"Good habits are easier to build while the team is small than to retrofit once it has grown.",
+  show:"The Talent Assessment Chart or Know Your Role. Small teams feel clarity about seats fastest.",
+  exit:"If you're happy with the size and pace you're at, that's a perfectly good place to be.",
+  avoid:"Implying they aren't ambitious enough.",
+  source:FIELD},
+ {id:"buy-in", cat:"trust", line:"My team won't buy into another program.",
+  means:["Past initiatives fizzled.","The team is stretched thin.","The owner isn't sure they can lead it."],
+  ack:"That's a real concern. Initiative fatigue is common.",
+  ask:"What happened with the last thing you tried to roll out?",
+  probes:["Who on the team would be most open to it, and who would push back?","What would the team need to see in the first month to believe this is different?"],
+  point:"Buy-in comes from the team building the plan themselves, with an outsider running the room so it isn't seen as the owner's pet project.",
+  show:"Offer The Audition with the leadership team in the room, so they experience it rather than hear about it.",
+  exit:"If the team needs a breather, waiting may be better than starting something they'll resist.",
+  avoid:"Promising the team will love it.",
+  source:FIELD},
+ {id:"guarantee", cat:"trust", line:"What results can you guarantee?",
+  means:["They've been oversold before.","They need something to justify the decision to a partner or board.","They're testing whether you're honest."],
+  ack:"Good question. You should be skeptical of anyone who guarantees results in your business.",
+  ask:"What result would make this clearly worth it to you?",
+  probes:["How would you measure that today?","What has gotten in the way of that result so far?"],
+  point:"Be straight: nobody can guarantee results in someone else's business. What a guide commits to is the process, the rhythm and the accountability.",
+  show:"The Baseline Assessment: agree on where you're starting so progress can be measured.",
+  exit:"If a guarantee is what you need to move forward, I'm not the right fit, and I'd rather tell you that now.",
+  avoid:"Quoting other clients' results as if they would transfer, or inventing numbers.",
+  source:FIELD},
+ {id:"self-implement", cat:"diy", line:"We'll just do it ourselves from the book.",
+  means:["Budget-conscious.","A strong do-it-yourself culture.","Not convinced outside help adds value."],
+  ack:"That can work. The tools are public, and some disciplined teams do it well.",
+  ask:"Who would run the sessions, and would that person also be taking part in them?",
+  probes:["Who would challenge the person running the meeting?","What happens to the system in your busiest quarter?"],
+  point:"The catch is that the leader ends up facilitating and participating at once, and the system is the first thing to slip when it gets busy. A guide runs the room so the CEO can take part instead of refereeing.",
+  show:"Offer to sit in on their first quarterly session, or run The Audition on one priority.",
+  exit:"If you have a disciplined team and someone to own it, try it. Call me if it stalls.",
+  avoid:"Implying they can't do it. Lay out the trade-off and let them decide.",
+  source:"Apogee insights: Should You Self-Implement EOS® or Hire a Guide?; Why a Business Book Rarely Changes Your Company"},
+ {id:"integrator", cat:"diy", line:"Our COO already runs our meetings. We don't need an outsider.",
+  means:["A strong number two is in place.","Fear of undercutting the COO.","Reluctance to add another voice."],
+  ack:"A strong COO is a real asset. Plenty of companies never find one.",
+  ask:"When the hardest topics come up, who challenges the CEO? And who challenges the COO?",
+  probes:["Which topics tend to get softened in the room?","Who holds the COO accountable today?"],
+  point:"Even a great COO is a participant with a seat to protect. An outside guide brings patterns from many companies and can say what insiders can't.",
+  show:"Know Your Role: make clear what the COO owns, so the guide supports them rather than competes.",
+  exit:"If those hard conversations already happen in the room, you may not need an outsider.",
+  avoid:"Positioning yourself as a replacement for the COO.",
+  source:"Apogee insights: The Integrator; Should You Self-Implement EOS® or Hire a Guide?"},
+ {id:"send-info", cat:"process", line:"Just send me some information.",
+  means:["A genuine evaluator.","A polite exit.","They need something to show a partner."],
+  ack:"Happy to. I'd rather send something useful than a brochure.",
+  ask:"What's the main thing you'd want it to help you decide?",
+  probes:["Who do you use for that today, and how's it going?","Say it answers that question. What would you want to happen next?"],
+  point:"Tailor what you send to their one question, and agree on what happens after they've read it.",
+  show:"One page that answers their question, plus one sentence on why it matters for them.",
+  exit:"Read it in your own time. If it raises questions, I'm glad to talk. If not, no follow-up needed.",
+  avoid:"Sending a pile of attachments with no agreed next step.",
+  source:FIELD},
+ {id:"references", cat:"process", line:"Can I talk to a couple of your clients first?",
+  means:["A specific worry they haven't said out loud.","Due diligence they do with everyone.","A polite way to slow things down."],
+  ack:"Of course. Talking to people who've done it is smart.",
+  ask:"What would you most want to ask them? That way I can connect you with the right people.",
+  probes:["What's behind that question for you?","Say those conversations go well. Where would you want to go from there?"],
+  point:"Whatever they want to ask a reference is usually the real concern. Address it directly now, and still make the introduction.",
+  show:"Introduce a client whose situation matches the concern they named.",
+  exit:"If those conversations raise doubts, that's useful to know too. Either way, let's agree on what happens after you've spoken to them.",
+  avoid:"Sending names with no agreed next step. It's one of the most common ways these conversations go quiet.",
+  source:FIELD},
+ {id:"proposal", cat:"process", line:"Can you just send me a proposal?",
+  means:["They want to know the cost before investing more time.","They're comparing options.","A quick way to end the call."],
+  ack:"Happy to put something together.",
+  ask:"So it's actually useful, could I ask a few questions about how things run now? It's possible you don't need this at all.",
+  probes:["What do you want the proposal to help you decide?","Say it covers what you need. What happens next on your side?"],
+  point:"A proposal written before you understand their situation is just a price sheet. One written after reflects their problems in their own words.",
+  show:"Build it around the two or three problems and goals they named, and offer The Audition before anything formal.",
+  exit:"Once you've seen it, if it fits what you're after, what would you want the next step to be?",
+  avoid:"Quoting numbers in the first conversation, or sending a generic deck.",
+  source:FIELD},
+ {id:"board", cat:"process", line:"I'd need to take this to my partner or board.",
+  means:["Real governance, common at banks, credit unions and partnerships.","They need material to make the case.","A soft no."],
+  ack:"Of course. Everyone who'll live with the system should have a say.",
+  ask:"What will they want to understand first, and what concerns do you expect them to raise?",
+  probes:["What do they care about most when they look at a decision like this?","How would you answer those concerns today?"],
+  point:"An operating system only works when the whole leadership team owns it, so bringing them in early is exactly right.",
+  show:"Offer a short joint conversation, or The Audition with the full team in the room.",
+  exit:"Would a joint conversation help, or would you rather take it to them first and come back to me?",
+  avoid:"Trying to close the person in front of you before the decision-makers are in the room.",
+  source:"Pinnacle Biz Dev: The Visionary Call Is Where the Decision Is Made"},
  {id:"working", cat:"eos", line:"We already run EOS®, and it's working.",
   means:["It really is working, and they're asking you to back off.","It mostly works, and they'd rather not admit the parts that don't.","They're testing whether you'll attack EOS®."],
   ack:"That's great to hear. A lot of teams get real traction from it, and I'd never ask you to tear out something that works.",
   ask:"What's working best right now? And is there any part that's started to feel like a chore?",
+  probes:["Sounds like it's running well. If you could change one thing about how it runs, what would it be?","What does a good week look like with it?"],
   point:"If something is straining, Pinnacle doesn't start over. A guide keeps the tools that work and tailors the rest.",
   show:"Open the EOS® to Pinnacle tab and show how their quarterly priorities and weekly meeting carry over.",
   exit:"If it's all working, keep doing it. I'd just like to be the person you call if that changes.",
@@ -263,6 +468,7 @@ var OBJ = [
   means:["Switching feels expensive.","They're proud of the habit they built.","They worry about confusing the team."],
   ack:"That shared language is hard-won. Losing it would be a real cost.",
   ask:"If you kept the habits and the vocabulary, what would you still want to be different?",
+  probes:["When you first brought it in, what were you hoping it would fix? Is that still what matters most?","Which habit has stuck best, and which takes the most effort to keep going?"],
   point:"Nobody has to unlearn anything. A Pinnacle Guide can work with the tools your team already uses and add others only where they fit.",
   show:"Walk the EOS® to Pinnacle tab together: each habit and its closest Pinnacle tool.",
   exit:"If the shared language is the main value and nothing else is missing, there's no reason to change.",
@@ -272,6 +478,7 @@ var OBJ = [
   means:["Timing really is the concern.","A polite no.","They picture a big, disruptive install."],
   ack:"Fair. Changing systems mid-stride is the last thing a busy team needs.",
   ask:"When's your next quarterly planning session? Would that be a natural point to look at this?",
+  probes:["What would make the next planning session feel different from the last one?","If you waited until next year, what would that cost the team, if anything?"],
   point:"This isn't a rip-and-replace. You can start at a natural planning break and keep what's running in the meantime.",
   show:"Offer The Audition: run one Pinnacle tool live on one real priority. No switch required.",
   exit:"Should I check back before your next quarterly, or would you rather reach out when the timing's right?",
@@ -281,15 +488,27 @@ var OBJ = [
   means:["A real relationship built on trust.","They expect you to badmouth the Implementer.","A commitment is still running."],
   ack:"Loyalty to someone who's helped you is a good sign. I'm not here to change that.",
   ask:"What has your Implementer helped most with? Has anything come up that fell outside the model?",
+  probes:["When you chose to work with them, what were you looking for? Has that changed as you've grown?","When something didn't fit the model, what happened?"],
   point:"The difference isn't the person, it's the rules. Implementers deliver EOS® as designed under a franchise agreement. A Pinnacle Guide is free to tailor the system and draw on other methods.",
-  show:"Point them to Pinnacle's EOS® vs. Pinnacle comparison so they can read it on their own time.",
+  show:"Point them to Pinnacle's EOS® vs. Pinnacle comparison so they can read it in their own time.",
   exit:"If the relationship works and the model fits, stay with it. If you ever hit something the model can't flex for, I'm glad to talk.",
   avoid:"Criticizing the Implementer, or implying they're less capable.",
   source:"EOS Worldwide Franchise Disclosure Document, as summarized in Apogee insight: EOS® Implementer vs. Pinnacle Guide"},
+ {id:"peers", cat:"eos", line:"Everyone in our peer group uses EOS®.",
+  means:["Social proof.","They want to compare notes with peers.","Worry about being the odd one out."],
+  ack:"That makes sense. It helps when the people you trade notes with use the same tools.",
+  ask:"What do your peers say works best for them? Anything they complain about?",
+  probes:["What have you heard from them that you'd want, and what wouldn't you?","How is your business different from theirs?"],
+  point:"Pinnacle draws on tools those peers will recognize, so you can still compare notes. What changes is that the system is shaped to your business.",
+  show:"The EOS® to Pinnacle tab: same concepts, tailored delivery.",
+  exit:"If being on the same system as your peers matters most, that's a legitimate reason to choose it.",
+  avoid:"Selling against EOS® inside a group or venue that runs it. Name it, take it off the table, and ask only for introductions.",
+  source:"Field note, Brian Vinci"},
  {id:"didnt-stick", cat:"outgrow", line:"We tried EOS® and it didn't stick.",
   means:["Facilitation broke down, often because they ran it themselves.","The leadership team wasn't aligned.","They've decided operating systems don't work for them."],
   ack:"That's frustrating, especially after the time your team put in.",
   ask:"Where did it start to slip? The meetings, the priorities, or getting the team to own it?",
+  probes:["How long did it run before it faded?","What did the team say when it stopped?"],
   point:"When a system stalls, it's usually the follow-through, not the idea. A guide runs the room so you can take part, and adapts the tools that didn't fit.",
   show:"Match their slip point to a Bedrock tool and offer to run it in The Audition.",
   exit:"If the team isn't ready to try again, that's a fair call. Better to wait than to start twice.",
@@ -299,6 +518,7 @@ var OBJ = [
   means:["The meeting has lost its energy.","Real issues get parked week after week.","The team has outgrown a fixed agenda."],
   ack:"That happens to a lot of good teams. The discipline got you here, and now it feels like ritual.",
   ask:"What's the last big issue that came up in that meeting and never actually got resolved?",
+  probes:["How long has the meeting felt that way?","What does it cost you when those issues carry over week to week?"],
   point:"When the agenda runs the meeting, the system is running you. A guide can reshape your meeting rhythm around the issues that matter now.",
   show:"Essential Meeting Structures, one of the 7 Bedrock Tools.",
   exit:"If a tweak to the agenda fixes it, try that first. You may not need anything more.",
@@ -308,6 +528,7 @@ var OBJ = [
   means:["Their business is unusual in structure, industry or stage.","They've grown past what fit at a smaller size.","One specific tool is causing the friction."],
   ack:"That's a sharp observation. Most leaders don't notice it until it's been going on a while.",
   ask:"Which part feels most forced: the plan, the seats, or the quarterly priorities?",
+  probes:["When did you first notice it?","What does the business need that the current format can't hold?"],
   point:"Tools should serve the strategy, not the other way round. Pinnacle starts from your business and picks the tools that fit it.",
   show:"Strategy Square or S.V.E.P., depending on where the strain is.",
   exit:"If one tool is causing the friction, adjusting that one might be enough.",
@@ -317,6 +538,7 @@ var OBJ = [
   means:["Change fatigue.","Consultant fatigue.","Fear of looking bad to the team a second time."],
   ack:"That's the right question. Your team's patience isn't unlimited.",
   ask:"Looking back on the last attempt, what would you do differently?",
+  probes:["What would need to be true this time for you to trust it?","Who on the team would be most skeptical, and why?"],
   point:"You shouldn't have to take it on faith. See how a guide works on one real priority before you commit to anything.",
   show:"The Audition: one tool, one live priority, and both sides decide whether there's a fit.",
   exit:"If you'd rather leave it for now, that's reasonable. Asking that question means you'll choose well when you're ready.",
@@ -326,6 +548,7 @@ var OBJ = [
   means:["Genuine curiosity.","They've noticed overlapping tools.","Skeptical of copycat offers."],
   ack:"There's real overlap. Both help a leadership team set priorities, meet well and hold each other accountable.",
   ask:"What have you heard about each so far?",
+  probes:["What made you ask?","What matters more to you: a standard system, or one shaped to your business?"],
   point:"The difference is the rules. EOS® is one fixed system delivered the same way everywhere. Pinnacle draws on EOS-style tools, Scaling Up, OKRs and others, and a guide shapes them to your business.",
   show:"The 5 Pinnacle Principles™: People, Purpose, Playbooks and Performance, which add up to Profits.",
   exit:"If you want one standard system delivered exactly as designed, EOS® is a good choice, and I'll tell you so.",
@@ -335,6 +558,7 @@ var OBJ = [
   means:["They're comparing proposals.","An Implementer has already pitched them.","They want a crisp answer to repeat to a partner."],
   ack:"Good question, and the answer is simpler than it sounds.",
   ask:"Are you weighing both right now, or still deciding whether you need either?",
+  probes:["What do you want from the person in the room?","What would make you trust an outsider with your leadership team?"],
   point:"An Implementer is a franchisee who delivers EOS® in strict conformance with its standards. A Certified Pinnacle Guide has built and run companies and is free to tailor the system. You take part; the guide runs the room.",
   show:"Send Pinnacle's EOS® vs. Pinnacle comparison afterward so they can reread it.",
   exit:"Both are legitimate. The question is whether you want a faithful install or a tailored one.",
@@ -344,56 +568,63 @@ var OBJ = [
   means:["Safety in a known name.","Their peers use it.","Easier to explain to the team or the board."],
   ack:"Name recognition counts. It's easier to get a team behind a system they've heard of.",
   ask:"How standard is your business? Is anything about your structure or industry unusual?",
+  probes:["Which part of your business is least like everyone else's?","What would make the choice easy to explain to your team?"],
   point:"Popularity tells you a system works for many companies. Fit tells you whether it'll work for yours. The more unusual the business, the more tailoring matters.",
   show:"Ask about their structure, then run a slice of the Talent Assessment Chart or Strategy Square as a taste of tailoring.",
   exit:"If you're a standard fit and want something off the shelf, EOS® may be the better pick. I'd rather you choose right than choose me.",
   avoid:"Arguing about which system is better. There's no universal best, only the best fit.",
-  source:"Apogee insight: EOS® Alternatives: How to Choose a Business Operating System That Fits"},
- {id:"self-implement", cat:"diy", line:"We'll just self-implement from the book.",
-  means:["Budget-conscious.","A strong do-it-yourself culture.","Not convinced outside help adds value."],
-  ack:"That can work. The tools are public, and some disciplined teams do it well.",
-  ask:"Who would run the sessions, and would that person also be taking part in them?",
-  point:"The catch is that the leader ends up facilitating and participating at once, and the system is the first thing to slip when it gets busy. A guide runs the room so the CEO can take part instead of refereeing.",
-  show:"Offer to sit in on their first quarterly, or run The Audition on one priority.",
-  exit:"If you have a disciplined team and someone to own it, try it. Call me if it stalls.",
-  avoid:"Implying they can't do it. Lay out the trade-off and let them decide.",
-  source:"Apogee insights: Should You Self-Implement EOS® or Hire a Guide?; Why a Business Book Rarely Changes Your Company"},
- {id:"integrator", cat:"diy", line:"Our COO already runs our meetings. We don't need an outsider.",
-  means:["A strong number two is in place.","Fear of undercutting the COO.","Reluctance to add another voice."],
-  ack:"A strong COO is a real asset. Plenty of companies never find one.",
-  ask:"When the hardest topics come up, who challenges the CEO? And who challenges the COO?",
-  point:"Even a great COO is a participant with a seat to protect. An outside guide brings patterns from many companies and can say what insiders can't.",
-  show:"Know Your Role: make clear what the COO owns, so the guide supports them rather than competes.",
-  exit:"If those hard conversations already happen in the room, you may not need an outsider.",
-  avoid:"Positioning yourself as a replacement for the COO.",
-  source:"Apogee insights: The Integrator; Should You Self-Implement EOS® or Hire a Guide?"},
- {id:"peers", cat:"process", line:"Everyone in our peer group uses EOS®.",
-  means:["Social proof.","They want to compare notes with peers.","Worry about being the odd one out."],
-  ack:"That makes sense. It helps when the people you trade notes with use the same tools.",
-  ask:"What do your peers say works best for them? Anything they complain about?",
-  point:"Pinnacle draws on tools those peers will recognize, so you can still compare notes. What changes is that the system is shaped to your business.",
-  show:"The EOS® to Pinnacle tab: same concepts, tailored delivery.",
-  exit:"If being on the same system as your peers matters most, that's a legitimate reason to choose it.",
-  avoid:"Selling against EOS® inside a group or venue that runs it. Name it, take it off the table, and ask only for introductions.",
-  source:"Field note, Brian Vinci"},
- {id:"send-info", cat:"process", line:"Just send me something comparing the two.",
-  means:["A genuine evaluator.","A polite exit.","They need something to show a partner."],
-  ack:"Happy to. I'd rather send something useful than a brochure.",
-  ask:"What's the main thing you want it to help you decide?",
-  point:"Tailor what you send to that one question, whether it's flexibility, the guide relationship, or what carries over from EOS®.",
-  show:"Pinnacle's EOS® vs. Pinnacle page, plus one sentence on why it matters for them.",
-  exit:"Read it on your own time. If it raises questions, I'm glad to talk. If not, no follow-up needed.",
-  avoid:"Sending a pile of attachments. One page that answers their question beats ten.",
-  source:"Pinnacle Biz Dev: Dealing With Objections"},
- {id:"board", cat:"process", line:"I'd need to take this to my partner or board.",
-  means:["Real governance, common at banks, credit unions and partnerships.","They need material to make the case.","A soft no."],
-  ack:"Of course. Everyone who'll live with the system should have a say.",
-  ask:"What will they want to understand first, and what concerns do you expect them to raise?",
-  point:"An operating system only works when the whole leadership team owns it, so bringing them in early is exactly right.",
-  show:"Offer a short joint conversation, or The Audition with the full team in the room.",
-  exit:"Would a joint conversation help, or would you rather take it to them first and come back to me?",
-  avoid:"Trying to close the person in front of you before the decision-makers are in the room.",
-  source:"Pinnacle Biz Dev: The Visionary Call Is Where the Decision Is Made"}
+  source:"Apogee insight: EOS® Alternatives: How to Choose a Business Operating System That Fits"}
+];
+
+var LESSONS = [
+ {t:"Let them reach it themselves",
+  idea:"A conclusion you hand someone gets argued with. One they reach on their own gets defended. Turn your statements into questions.",
+  say:["Instead of “Pinnacle is more flexible,” ask “Where has your current setup had to bend to fit you?”"],
+  watch:"A leading question is just a statement with a question mark. Ask what you actually want to know."},
+ {t:"Frame the conversation up front",
+  idea:"Say at the start what the conversation is for, and that “not a fit” is an acceptable ending. People relax when they know they won't be cornered.",
+  say:["“Today is mostly for me to understand how you run things now, what that's getting you, and what you'd want instead. If it looks like I can help, we'll talk about a next step. If not, I'll tell you.”"],
+  watch:"Don't drop the “if not” part. It's what makes the frame believable."},
+ {t:"Spend most of the time understanding",
+  idea:"In a good first conversation, they do most of the talking about where they are and where they want to be. Your part describing Pinnacle is short, and only about what they raised.",
+  say:["Write down their exact words. You'll use them when you bridge to a next step."],
+  watch:"If you've described tools before you know their gap, you're presenting."},
+ {t:"Slow down",
+  idea:"A pause before and inside a question tells them you're curious, and gives them room to get past the first, polished answer.",
+  say:["Ask, then wait a few seconds after they stop talking. The second answer is often the real one."],
+  watch:"Rapid-fire questions feel like a job interview."},
+ {t:"Find what they'd change",
+  idea:"Nobody likes everything about their current setup, even when it works. Ask what they'd change without implying that anything is wrong.",
+  say:["“Sounds like it's working well for you. If you could change one thing about how it runs, what would it be?”"],
+  watch:"If they say “nothing,” believe them and move on."},
+ {t:"Revisit why they chose it",
+  idea:"People pick a system, a coach or a do-it-yourself approach for the problems they had at the time. Asking how those needs have shifted lets them notice the gap themselves.",
+  say:["“When you first set this up, what were you hoping it would fix? Is that still what matters most?”"],
+  watch:"Ask out of curiosity, not to set a trap."},
+ {t:"Clarify, then go deeper",
+  idea:"First answers are general. Short follow-ups get to the specific issue and what it's costing them.",
+  say:["“What do you mean by that?”","“How long has that been going on?”","“How has that affected you, or the team?”"],
+  watch:"Stop once they've answered. Probing past that turns into pressure."},
+ {t:"Let them say why it matters now",
+  idea:"Ask what happens if nothing changes, and why they'd act now rather than later. Their reasons move them. Yours don't.",
+  say:["“If nothing changes, what does next year look like for the leadership team?”","“Why look at this now, rather than next year?”"],
+  watch:"Never inflate the consequences. If waiting is fine, say so."},
+ {t:"Bridge with their words",
+  idea:"Before you show anything, play back what they want and how the current situation is affecting them, then ask permission to go on.",
+  say:["“You said you want the team owning the quarterly priorities, and right now it all lands on you, which sounds exhausting. Would it help if I showed you how a guide would handle that?”"],
+  watch:"Use their words, not your summary of them."},
+ {t:"Show only what fixes their gap",
+  idea:"Three beats: the problem they named, how Pinnacle handles it, and what that would mean for them. Check in as you go.",
+  say:["“You mentioned the same issues come back every week. The way we handle that is… For you, that would mean… How does that land?”"],
+  watch:"Skip every tool and feature they didn't ask about."},
+ {t:"Ask what's behind “send me…”",
+  idea:"Requests for information, references or a proposal often stand in for a concern they haven't voiced. Ask what they want it to show them, then ask what happens if it does.",
+  say:["“Happy to. What would you want it to help you decide?”","“Say it answers that. What would you want to happen next?”"],
+  watch:"Sending things with no agreed next step is how conversations go quiet."},
+ {t:"Earn referrals by asking what helped",
+  idea:"Ask a client what has helped most. Hearing themselves say it makes a referral natural, and offering to let them make the introduction warms it up.",
+  say:["“What's been most useful for you so far?”","“Who else do you know who's dealing with something like that?”"],
+  watch:"When you call a referral, say they might be facing something similar. Don't assume they're interested."}
 ];
 
 var MAP = [
@@ -417,14 +648,16 @@ var PERSONAS = [
  {id:"stalled", label:"Stalled self-implementer", desc:"the CEO of a 35-person construction firm whose self-run EOS® rollout faded after a year; frustrated and skeptical that anything will stick"},
  {id:"diy", label:"Book-on-the-desk founder", desc:"the founder of a 20-person professional services firm with a copy of Traction on the desk, planning to implement it alone to save money"},
  {id:"board", label:"Board-reporting CEO", desc:"the president of a community credit union who reports to a board, has heard about EOS® from peers, and needs anything new to be defensible to that board"},
+ {id:"firsttime", label:"Skeptical first-timer", desc:"the owner of a 25-person HVAC company who has never used an operating system or outside advisor, is cost-conscious, and isn't sure they need help"},
  {id:"fatigued", label:"Program-fatigued owner", desc:"a second-generation owner of a family business who has been through two consultants and is tired of programs"}
 ];
 
 var SELF = [
  "I acknowledged what they said before adding anything.",
  "I asked an open question before making a point.",
+ "I used their words, not my pitch.",
  "I landed one difference, not a list.",
- "I said nothing negative about EOS® or their Implementer.",
+ "I said nothing negative about the alternative they mentioned.",
  "I offered a next step and left room for no."
 ];
 
@@ -439,7 +672,7 @@ try { var raw = JSON.parse(localStorage.getItem(KEY) || "[]"); if (Array.isArray
 function saveDrilled(){ try { localStorage.setItem(KEY, JSON.stringify(drilled)); } catch(e) {} }
 
 /* Tabs */
-var TABS = ["objections","translator","drill","roleplay"];
+var TABS = ["objections","lessons","translator","drill","roleplay"];
 function showTab(name){
   if (TABS.indexOf(name) < 0) name = "objections";
   TABS.forEach(function(t){
@@ -500,6 +733,10 @@ function pathList(o){
     var li = el("li", "step" + (s[2] ? " key" : ""));
     li.append(el("span", "num", String(i+1)));
     var body = el("div"); body.append(el("h3", null, s[0]), el("p", "say", s[1]));
+    if (i === 1 && o.probes && o.probes.length) {
+      body.append(el("div", "deeper-label", "If they open up, go deeper"));
+      var dl = el("ul", "deeper"); o.probes.forEach(function(q){ dl.append(el("li", null, q)); }); body.append(dl);
+    }
     li.append(body); ol.append(li);
   });
   return ol;
@@ -522,8 +759,20 @@ function renderCard(){
   act.append(d, cp, st); card.append(act);
 }
 function cardText(o){
-  return "“" + o.line + "”\n\nACKNOWLEDGE: " + o.ack + "\nASK: " + o.ask + "\nLAND ONE POINT: " + o.point + "\nSHOW IT: " + o.show + "\nLEAVE ROOM FOR NO: " + o.exit + "\nAVOID: " + o.avoid + "\n\nSource: " + o.source;
+  return "“" + o.line + "”\n\nACKNOWLEDGE: " + o.ack + "\nASK: " + o.ask + (o.probes ? "\nGO DEEPER: " + o.probes.join(" / ") : "") + "\nLAND ONE POINT: " + o.point + "\nSHOW IT: " + o.show + "\nLEAVE ROOM FOR NO: " + o.exit + "\nAVOID: " + o.avoid + "\n\nSource: " + o.source;
 }
+
+/* Lessons */
+(function(){
+  var g = $("lessonGrid");
+  LESSONS.forEach(function(l){
+    var c = el("article", "lesson");
+    c.append(el("h3", null, l.t), el("p", null, l.idea));
+    var tr = el("div", "try"); l.say.forEach(function(x){ tr.append(el("span", null, x)); }); c.append(tr);
+    c.append(el("div", "watch", "Watch for: " + l.watch));
+    g.append(c);
+  });
+})();
 
 /* Translator */
 (function(){
@@ -576,8 +825,14 @@ function critique(text){
     if (closed.length === qs.length) out.push(["warn","Your question can be answered yes or no. Try opening with what, where or how."]);
     else out.push(["ok","You asked an open question."]);
   }
+  var sentences = text.split(/(?<=[.?!])\s+/).filter(function(x){ return x.trim().length > 2; });
+  var statements = sentences.filter(function(x){ return !/\?\s*$/.test(x); }).length;
+  if (qs && statements >= 3 && statements > qs.length * 2)
+    out.push(["warn","Mostly telling. Try turning one of your statements into a question."]);
+  if (/^\s*(at pinnacle|pinnacle|we |our |what we do|i think you should|you should)/i.test(text))
+    out.push(["warn","You opened with yourself or advice. Open with them: acknowledge, then ask."]);
   if (/\b(rigid|outdated|broken|cult|cookie[- ]cutter|one[- ]size[- ]fits[- ]all|doesn'?t work|didn'?t work|failed|fails|inferior|worse|bad|boxed in|limited|limiting|franchise mill)\b/i.test(text))
-    out.push(["warn","Some wording may land as a knock on EOS®. Describe the difference and let them name the flaws."]);
+    out.push(["warn","Some wording may land as a knock on EOS® or whatever they use now. Describe the difference and let them name the flaws."]);
   if (/\b(guarantee[ds]?|must|obviously|have to|need to|act now|today only|no[- ]brainer|trust me|always works)\b/i.test(text))
     out.push(["warn","Watch for pressure or certainty words (must, guarantee, need to). They close doors."]);
   if (/\$\s?\d|\b\d+\s?(k|dollars|per month|a month)\b/i.test(text))
@@ -629,9 +884,10 @@ function buildPrompt(){
     "Rules for you:",
     "- Stay in character. Open with that objection in your own words, then wait for my reply.",
     "- React the way this person really would. Push back when I pitch, open up when I ask good questions, and say no if I pressure you.",
+    "- Start with a surface-level version of your concern. Reveal the deeper reason only if I ask good follow-up questions.",
     "- Keep each reply to one to three sentences. Raise one related concern along the way.",
     "- Don't invent statistics, pricing or guarantees about Pinnacle or EOS®.",
-    "- After " + n + " exchanges, or as soon as I type END, step out of character and give me feedback on five things: (1) did I acknowledge before responding, (2) did I ask open questions before telling, (3) did I land one clear Pinnacle difference instead of a list, (4) did I avoid criticizing EOS® or the Implementer, (5) did I offer a respectful next step and leave room for no. Quote my strongest and weakest line, and suggest a better version of the weakest.",
+    "- After " + n + " exchanges, or as soon as I type END, step out of character and give me feedback on seven things: (1) did I frame the conversation early, (2) did I acknowledge before responding, (3) did I ask open questions and follow up for specifics and impact before describing anything, (4) did I let you put into words why change would matter, (5) did I land one clear difference instead of a list, (6) did I avoid criticizing EOS®, your current advisor or doing it yourselves, (7) did I offer a respectful next step and leave room for no. Quote my strongest and weakest line, and suggest a better version of the weakest.",
     "",
     "Background on my side: Pinnacle is guide-led. A Certified Pinnacle Business Guide has run companies and can tailor the system, drawing on EOS-style tools, Scaling Up, OKRs and others. EOS® Implementers are franchisees who deliver EOS® as designed. A common next step is The Audition, a working session on one real priority where both sides decide whether there's a fit.",
     ctx ? "\nMy own context: " + ctx : "",
