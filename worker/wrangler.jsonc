@@ -1,0 +1,21 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "pinnacle-roleplay",
+  "main": "src/index.ts",
+  "account_id": "ad07b98b1977278905440ad61d59e41b",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "observability": { "enabled": true },
+  "vars": {
+    "ALLOWED_ORIGINS": "https://bvinci1-design.github.io",
+    "MODEL": "claude-opus-5-5",
+    "DAILY_CAP": "400",
+    "DAILY_CAP_PER_IP": "120"
+  },
+  "kv_namespaces": [
+    { "binding": "LIMITS", "id": "c5cb7186e5254ceba0763f9744e3f28a" }
+  ]
+  // Secrets (set with `wrangler secret put`, never in this file):
+  //   ANTHROPIC_API_KEY, GUIDE_PASSCODE
+}

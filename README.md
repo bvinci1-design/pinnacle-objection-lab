@@ -6,9 +6,29 @@ A practice tool for Certified Pinnacle Business Guides covering the objections o
 - **Lessons**: 12 conversation lessons plus a "where the time goes" guide to a first conversation.
 - **EOS® to Pinnacle**: shows each EOS term next to its closest Pinnacle tool.
 - **Drill**: write your reply, run a pattern check, compare it with the model path, and track which objections you've drilled.
-- **Role-play with Claude**: builds a prompt that has Claude play a prospect and then give feedback.
+- **Role-play with Claude**: a live chat where Claude plays a prospect, then scores the guide on seven points. On the public site guides can speak their replies and hear the prospect. A copy-prompt fallback remains for anyone without live access.
 
-It needs no accounts, API keys or server. Drill progress is saved only in the viewer's own browser.
+Drill progress and the guide passcode are saved only in the viewer's own browser.
+
+## How live role-play works
+
+| Where it's opened | What runs it | Who pays |
+|---|---|---|
+| Public site (GitHub Pages) | `worker/`, a Cloudflare Worker (`pinnacle-roleplay`, Apogee account) that calls the Claude API with Brian's key | Brian's Anthropic API account |
+| Claude Artifact | The artifact's built-in Claude access (`sample` capability) | Each viewer's own Claude plan |
+
+The Worker accepts only requests from the Pages origin with the right guide passcode, and stops at 400 requests a day overall and 120 per IP (soft caps in KV). It uses `claude-opus-5-5` (low effort for prospect turns, medium for feedback) with server-side refusal fallback on. Change `MODEL` in `worker/wrangler.jsonc` to `claude-haiku-5-5` for faster, cheaper turns.
+
+The role-play rules live in one place, `src/roleplay-prompt.js`. The Worker imports it and `build.py` inlines it into the page.
+
+Secrets, set once by Brian from `worker/` (never in a file):
+
+```
+npx wrangler secret put ANTHROPIC_API_KEY
+npx wrangler secret put GUIDE_PASSCODE
+```
+
+Redeploy the Worker after editing it or the prompt file: `cd worker && npx wrangler deploy`.
 
 Pinnacle marks are used with Pinnacle Business Guides' permission (confirmed by Brian Vinci, 2026-10-09).
 
@@ -31,7 +51,7 @@ To update both, run `python3 build.py`, commit and push for Pages, and republish
 
 ## Editing content
 
-All content lives in three arrays at the top of the script in `src/app.html`: `OBJ` (objections), `LESSONS`, `MAP` (the translator), and `PERSONAS` (role-play prospects). Keep the same rules when adding content:
+All content lives in arrays at the top of the script in `src/app.html`: `OBJ` (objections), `LESSONS`, `MAP` (the translator), and `PERSONAS` (role-play prospects). Keep the same rules when adding content:
 
 - Never say anything negative about EOS®, an Implementer, a prospect's coach or their do-it-yourself approach. Describe the difference instead.
 - Write all content in original wording. Don't paste text from books or paid training material.
