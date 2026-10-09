@@ -100,6 +100,8 @@ export default {
         system,
         messages,
       });
+      // Token counts only, never conversation text: lets `wrangler tail` show what a role-play costs.
+      console.log(JSON.stringify({ kind: ending ? "feedback" : "turn", model: response.model, input_tokens: response.usage.input_tokens, output_tokens: response.usage.output_tokens, stop: response.stop_reason }));
       if (response.stop_reason === "refusal") return json({ error: "declined" }, 200, cors);
       const reply = response.content
         .filter((b): b is Anthropic.TextBlock => b.type === "text")
