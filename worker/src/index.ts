@@ -26,6 +26,8 @@ function corsHeaders(origin: string | null, env: Env): Record<string, string> {
 }
 
 function json(body: unknown, status: number, cors: Record<string, string>): Response {
+  // Log why a request was refused (the error code only, never request content).
+  if (status >= 400 || (body as any)?.error) console.log(JSON.stringify({ kind: "rejected", status, error: (body as any)?.error }));
   return new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json", ...cors } });
 }
 
@@ -51,7 +53,8 @@ async function overCap(env: Env, ip: string): Promise<boolean> {
 type Turn = { role: "user" | "assistant"; content: string };
 
 function cleanTurns(raw: unknown): Turn[] | null {
-  if (!Array.isArray(raw) || raw.length === 0 || raw.length > MAX_TURNS) return null;
+  // An empty list is valid: it's the opening request, where the prospect speaks first.
+  if (!Array.isArray(raw) || raw.length > MAX_TURNS) return null;
   const turns: Turn[] = [];
   for (const t of raw) {
     if (!t || (t.role !== "user" && t.role !== "assistant") || typeof t.content !== "string") return null;
@@ -59,7 +62,7 @@ function cleanTurns(raw: unknown): Turn[] | null {
     if (!content) return null;
     turns.push({ role: t.role, content });
   }
-  if (turns[turns.length - 1].role !== "user") return null;
+  if (turns.length > 0 && turns[turns.length - 1].role !== "user") return null;
   return turns;
 }
 
@@ -85,7 +88,7 @@ export default {
     const ip = request.headers.get("CF-Connecting-IP") || "unknown";
     if (await overCap(env, ip)) return json({ error: "daily_limit" }, 429, cors);
 
-    const ending = turns[turns.length - 1].content === "END";
+    const ending = turns.length > 0 && turns[turns.length - 1].content === "END";
     const system = buildRoleplayRules({ persona: body.persona, objection: body.objection, rounds: body.rounds, context: body.context });
     const messages: Anthropic.MessageParam[] = [{ role: "user", content: ROLEPLAY_KICKOFF }, ...turns];
 
