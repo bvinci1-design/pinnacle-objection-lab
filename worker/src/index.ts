@@ -75,6 +75,7 @@ export default {
     let body: any;
     try { body = await request.json(); } catch { return json({ error: "bad_request" }, 400, cors); }
 
+    if (!env.GUIDE_PASSCODE || !env.ANTHROPIC_API_KEY) return json({ error: "server_config" }, 503, cors);
     if (typeof body.passcode !== "string" || !safeEqual(body.passcode.trim(), env.GUIDE_PASSCODE)) {
       return json({ error: "bad_passcode" }, 401, cors);
     }
